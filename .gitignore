@@ -1,0 +1,35 @@
+# vagrant
+vagrant/cookbooks/*
+vagrant/Berksfile.lock
+vagrant/Gemfile.lock
+
+# os files
+.DS_Store
+
+# editor files
+*.sublime-*
+*.swp
+
+# mount files
+.apdisk
+.fseventsd
+
+# tmp files
+.sass-cache
+
+# rails
+# *.rbc
+# *.sassc
+# capybara-*.html
+# .rspec
+# /.bundle
+# /vendor/bundle
+# /log/*
+# /tmp/*
+# /db/*.sqlite3
+# /public/system/*
+# /coverage/
+# /spec/tmp/*
+# **.orig
+# rerun.txt
+# pickle-email-*.html

@@ -1,0 +1,132 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'berkshelf/vagrant'
+
+Vagrant::Config.run do |config|
+
+  # Settings
+  # ========
+  project       = "project_name"
+  title         = "Project Name"
+  db_type       = "pgsql"
+  
+  ip            = "192.168.33.20"
+  port          = 8080
+  gems          = ['compass', 'susy']
+  
+  ruby_version  = "ruby-1.9.3-p194"
+  rails_version = "3.2.11"
+
+  db_name       = project     # database to create
+  db_user       = project     # user to create
+  db_pwd        = "qwe"       # root pwd is root
+
+
+  # VirtualBox
+  # ==========
+  config.vm.customize ["modifyvm", :id, "--name", project]
+  config.vm.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
+
+
+  # Network
+  # =======
+  config.vm.network             :hostonly, ip
+  config.vm.forward_port        80, port
+  config.vm.host_name =         "localhost"
+
+  
+  # Box
+  # ===
+  config.package.name =         project + ".box"
+  config.vm.box =               "precise64"
+  config.vm.box_url =           "http://files.vagrantup.com/precise64.box"
+
+
+  # Share folders
+  # =============
+  config.vm.share_folder "project", "/srv/www/#{project}.dev", "../", :nfs => true
+
+
+  # Chef Provisioning
+  # =================
+  config.vm.provision :chef_solo do |chef|
+
+    # common software
+    chef.add_recipe "apt"
+    chef.add_recipe "openssl"
+    chef.add_recipe "git"
+    chef.add_recipe "vim"
+    chef.add_recipe "byobu"
+
+    # database
+    case db_type
+    when "mysql"
+      chef.add_recipe "mysql"
+      chef.add_recipe "mysql::server"
+    when "pgsql"
+      chef.add_recipe "postgresql"
+      chef.add_recipe "postgresql::server"
+    when "mgdb"
+      chef.add_recipe "mongodb"
+    end
+
+    # rvm and ruby
+    chef.add_recipe "rvm::system"
+    chef.add_recipe "rvm::vagrant"
+
+    # apache and passenger
+    chef.add_recipe "apache2"
+    chef.add_recipe "rvm_passenger::apache2"
+    chef.add_recipe "apache2::mod_rewrite"
+    chef.add_recipe "apache2::mod_deflate"
+
+    # vm customization
+    chef.add_recipe "vmconfig::install_gems"
+    chef.add_recipe "vmconfig::dotfiles"
+    chef.add_recipe "vmconfig::app"
+    chef.add_recipe "vmconfig::setup_db"
+
+    chef.json = {
+        :mysql => {
+          :server_root_password => 'root',
+          :server_debian_password => 'root',
+          :server_repl_password => 'root',
+          :bind_address => '127.0.0.1'
+        },
+        :postgresql => {
+          :password => {
+            :postgres => password
+          }
+        },
+        :rvm => {
+          :rubies => [ruby_version],
+          :gems => {
+            ruby_version => [
+              { 'name'    => 'chef' },
+              { 'name'    => 'rails', 'version' => rails_version }
+            ]
+          }
+        },
+        :rvm_passenger => {
+          :rvm_ruby => ruby_version
+        },
+        :nodejs => {
+          :install_method => 'source',
+          :version => node_version
+        },
+        :vmconfig => {
+          :db_type => "mysql",
+          :db_name => db_name,
+          :db_pwd => db_pwd,
+          :db_user => db_user,
+
+          :project  => project,
+          :public_dir => "public",
+          :project_type => "wordpress",
+          :gems => gems
+        }
+    }
+  end
+
+end

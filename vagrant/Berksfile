@@ -1,0 +1,28 @@
+site :opscode
+
+# common software
+cookbook 'apt'
+cookbook 'openssl'
+cookbook 'vim'
+cookbook 'git'
+cookbook 'byobu', :git => 'https://github.com/karellm/cookbook-byobu'
+
+# custom vm config
+cookbook 'vmconfig', :git => 'https://github.com/karellm/cookbook-vmconfig'
+
+# servers
+cookbook 'apache2'
+cookbook 'rvm_passenger', :git => 'https://github.com/fnichol/chef-rvm_passenger', :ref => 'v0.8.2'
+cookbook 'runit'
+cookbook 'unicorn'
+
+# databases
+cookbook 'database', :git => 'https://github.com/michaelklapper/database', branch: 'grant_statement'
+cookbook 'mysql'
+cookbook 'postgresql'
+cookbook 'mongodb'
+
+# programming languages
+cookbook 'php'
+cookbook 'rvm', :git => 'git://github.com/fnichol/chef-rvm.git', :ref => 'v0.9.0'
+cookbook 'nodejs', :git => 'https://github.com/fnichol/nodejs-cookbook'
