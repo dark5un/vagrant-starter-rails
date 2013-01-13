@@ -9,15 +9,15 @@ Vagrant::Config.run do |config|
   # ========
   project       = "project_name"
   title         = "Project Name"
-  db_type       = "pgsql"
   
-  ip            = "192.168.33.20"
-  port          = 8080
-  gems          = ['compass', 'susy']
+  ip            = "192.168.33.21"
+  port          = 8081
   
   ruby_version  = "ruby-1.9.3-p194"
   rails_version = "3.2.11"
+  node_version  = "0.8.11"
 
+  db_type       = "postgresql"
   db_name       = project     # database to create
   db_user       = project     # user to create
   db_pwd        = "qwe"       # root pwd is root
@@ -64,7 +64,7 @@ Vagrant::Config.run do |config|
     when "mysql"
       chef.add_recipe "mysql"
       chef.add_recipe "mysql::server"
-    when "pgsql"
+    when "postgresql"
       chef.add_recipe "postgresql"
       chef.add_recipe "postgresql::server"
     when "mgdb"
@@ -82,7 +82,6 @@ Vagrant::Config.run do |config|
     chef.add_recipe "apache2::mod_deflate"
 
     # vm customization
-    chef.add_recipe "vmconfig::install_gems"
     chef.add_recipe "vmconfig::dotfiles"
     chef.add_recipe "vmconfig::app"
     chef.add_recipe "vmconfig::setup_db"
@@ -96,7 +95,7 @@ Vagrant::Config.run do |config|
         },
         :postgresql => {
           :password => {
-            :postgres => password
+            :postgres => 'root'
           }
         },
         :rvm => {
@@ -116,17 +115,18 @@ Vagrant::Config.run do |config|
           :version => node_version
         },
         :vmconfig => {
-          :db_type => "mysql",
+          :db_type => db_type,
           :db_name => db_name,
           :db_pwd => db_pwd,
           :db_user => db_user,
 
           :project  => project,
           :public_dir => "public",
-          :project_type => "wordpress",
-          :gems => gems
+          :project_type => "rails"
         }
     }
   end
+
+  # config.vm.provision :shell, :inline => "cd /srv/www/#{project}.dev/ && rails new #{projet} --database=#{db_type}"
 
 end

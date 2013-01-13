@@ -23,6 +23,5 @@ cookbook 'postgresql'
 cookbook 'mongodb'
 
 # programming languages
-cookbook 'php'
 cookbook 'rvm', :git => 'git://github.com/fnichol/chef-rvm.git', :ref => 'v0.9.0'
 cookbook 'nodejs', :git => 'https://github.com/fnichol/nodejs-cookbook'
